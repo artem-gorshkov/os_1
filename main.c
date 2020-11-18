@@ -57,6 +57,12 @@ int main() {
     for (size_t i = 0; i < WRITE_THREADS_NUMBER; i++) {
         pthread_create(&write_threads[i], NULL, fill_segment_and_write_to_file, p);
         p += size_for_one_thread;
+//        Change priority
+//        struct sched_param param;
+//        int res;
+//        pthread_getschedparam(write_threads[i], &res, &param);
+//        param.sched_priority = 10;
+//        pthread_setschedparam(write_threads[i], res, &param);
     }
     while (count != WRITE_THREADS_NUMBER);
     log_memory("After filling area");
@@ -66,6 +72,12 @@ int main() {
     for (size_t i = 0; i < READ_THREADS_NUMBER; i++) {
         pthread_create(&read_threads[i], NULL, calculate_sum_of_file, NULL);
         printf("Created %zu read thread\n", i + 1);
+        //        Change priority
+//        struct sched_param param;
+//        int res;
+//        pthread_getschedparam(read_threads[i], &res, &param);
+//        param.sched_priority = 10;
+//        pthread_setschedparam(read_threads[i], res, &param);
     }
     getchar();
 
