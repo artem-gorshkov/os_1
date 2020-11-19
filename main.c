@@ -14,7 +14,7 @@
 
 #define SIZE 287 * 1024 * 1024
 #define WRITE_THREADS_NUMBER 73
-#define FILE_SIZE 37 * 1024 * 1024//E
+#define FILE_SIZE 37 * 1024 * 1024
 #define NUMBER_OF_FILE 287 / 37 + 1
 #define BLOCK_SIZE 12
 #define READ_THREADS_NUMBER 89
@@ -38,7 +38,6 @@ struct sem_file {
 };
 struct sem_file files[NUMBER_OF_FILE];
 static volatile bool terminate = false;
-static volatile uint32_t count = 0;
 
 int main() {
     remove(LOG_FILE);
@@ -64,9 +63,8 @@ int main() {
 //        param.sched_priority = 10;
 //        pthread_setschedparam(write_threads[i], res, &param);
     }
-    while (count != WRITE_THREADS_NUMBER);
-    log_memory("After filling area");
     getchar();
+    log_memory("After filling area");
 
     pthread_t read_threads[READ_THREADS_NUMBER];
     for (size_t i = 0; i < READ_THREADS_NUMBER; i++) {
@@ -116,15 +114,8 @@ void close_files() {
 
 void *fill_segment_and_write_to_file(void *p) {
     printf("Created write thread for %p\n", p);
-    bool k = false;
     while (!terminate) {
-        int a = getrandom((char *) p, size_for_one_thread, 0);
-        if (a == -1)
-            return 0;
-        if (!k) {
-            k = true;
-            count++;
-        }
+        getrandom((char *) p, size_for_one_thread, 0);
         size_t nf = rand() % NUMBER_OF_FILE - 1;
         sem_wait(&files[nf].sem);
         if (terminate) {
